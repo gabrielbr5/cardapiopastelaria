@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cardápio Digital - KA PASTÉIS E CREPES</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f8f9fa; margin: 0; padding: 20px; color: #343a40; }
+        .container { max-width: 800px; margin: 0 auto; background-color: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
+        h1, h2, h3 { text-align: center; color: #d9534f; }
+        ul { list-style: none; padding: 0; }
+        .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #dee2e6; }
+        .carrinho-item-display { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #dee2e6; }
+        .btn-add { background-color: #28a745; color: white; border: none; padding: 8px 14px; border-radius: 5px; cursor: pointer; transition: background-color 0.2s; font-weight: bold; }
+        .btn-add:hover { background-color: #218838; }
+        .total-carrinho { text-align: right; font-size: 1.4em; font-weight: bold; margin: 20px 0; color: #343a40; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ced4da; border-radius: 5px; font-size: 1em; }
+        .btn-finalizar, .btn-primary { width: 100%; background-color: #d9534f; color: white; border: none; padding: 15px; font-size: 1.2em; border-radius: 5px; cursor: pointer; margin-top: 10px; transition: background-color 0.2s; }
+        .btn-finalizar:hover, .btn-primary:hover { background-color: #c9302c; }
+        #dados-entrega, #troco-group { display: none; }
+        #first-page { text-align: center; }
+        #first-page .category-buttons button { background-color: #0d6efd; color: white; border: none; padding: 15px; font-size: 1em; border-radius: 8px; cursor: pointer; margin: 5px; transition: background-color 0.2s; min-width: 160px; }
+        #first-page .category-buttons button:hover { background-color: #0b5ed7; }
+        .back-button { background-color: #6c757d; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-size: 0.9em; margin-bottom: 15px; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
+        .modal-content { background-color: #fff; padding: 25px; border-radius: 10px; width: 90%; max-width: 500px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .modal-buttons { display: flex; justify-content: space-between; margin-top: 20px; }
+        .modal-buttons button { width: 48%; padding: 12px; border-radius: 5px; border: none; cursor: pointer; font-size: 1em; }
+        #btn-confirmar-personalizacao { background-color: #28a745; color: white; }
+        #btn-cancelar-personalizacao { background-color: #6c757d; color: white; }
+        .personalizacao-texto { font-size: 0.85em; color: #6c757d; display: block; margin-top: 4px; }
+        #order-summary-screen { display: none; text-align: center; }
+        .ingredientes-descricao { font-size: 0.85em; color: #6c757d; margin-top: 4px; }
+
+        /* --- NOVO: Estilo para o botão de remover item do carrinho --- */
+        .btn-remover {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%; /* Deixa o botão redondo */
+            width: 24px;
+            height: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: 15px;
+            line-height: 24px; /* Centraliza o 'X' verticalmente */
+            padding: 0;
+            flex-shrink: 0; /* Impede que o botão seja espremido */
+        }
+        .btn-remover:hover {
+            background-color: #c82333;
+        }
+        .carrinho-item-display > div {
+            flex-grow: 1; /* Permite que o texto cresça e o botão fique no canto */
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>KA PASTÉIS E CREPES</h1>
+        
+        <div id="first-page">
+            <h2>Seja Bem-vindo!</h2>
+            <div class="category-buttons">
+                <button onclick="filtrarPorCategoria('Salgados')">Pastéis Salgados</button>
+                <button onclick="filtrarPorCategoria('Doces')">Pastéis Doces</button>
+                <button onclick="filtrarPorCategoria('Bebidas')">Bebidas</button>
+                <button onclick="filtrarPorCategoria('Todos')">Ver Tudo</button>
+            </div>
+        </div>
+
+        <div id="main-app" style="display: none;">
+            <button class="back-button" onclick="showPage('first-page')">⬅️ Voltar ao Início</button>
+            <h2 id="menu-title">Nosso Cardápio</h2>
+            <ul id="menu-items"></ul>
+            <div id="resumo-pedido">
+                <h2>Seu Pedido</h2>
+                <ul id="carrinho-items"></ul>
+                <div class="total-carrinho">Total: R$ <span id="total-valor">0.00</span></div>
+                <div class="form-group"><label for="tipo-pedido">Tipo de Pedido:</label><select id="tipo-pedido" onchange="toggleEntrega()"><option value="retirada">Retirar no Local</option><option value="entrega">Delivery</option></select></div>
+                <div id="dados-retirada" class="form-group"><label for="nome-cliente">Seu Nome:</label><input type="text" id="nome-cliente" placeholder="Digite seu nome"></div>
+                <div id="dados-entrega" class="form-group"><label for="endereco-cliente">Endereço de Entrega:</label><input type="text" id="endereco-cliente" placeholder="Rua, Número, Bairro"></div>
+                <div class="form-group"><label for="forma-pagamento">Forma de Pagamento:</label><select id="forma-pagamento" onchange="toggleTroco()"><option value="Dinheiro">Dinheiro</option><option value="Cartão">Cartão</option><option value="Pix">Pix</option></select></div>
+                <div id="troco-group" class="form-group"><label for="valor-troco">Troco para quanto?</label><input type="number" id="valor-troco" placeholder="Ex: 50.00"></div>
+                <button class="btn-finalizar" onclick="finalizarPedido()">Finalizar Pedido</button>
+            </div>
+        </div>
+
+        <div id="order-summary-screen">
+            <h2>🎉 Pedido Enviado!</h2>
+            <p>Obrigado pela preferência. Seu resumo foi enviado para nosso WhatsApp.</p>
+            <button class="btn-primary" onclick="resetApp()">Fazer Novo Pedido</button>
+        </div>
+    </div>
+
+    <div id="personalizacao-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="modal-item-nome">Personalizar Item</h3>
+            <p>Desmarque os ingredientes que deseja remover:</p>
+            <ul id="modal-ingredientes-lista"></ul>
+            <div class="form-group"><label for="modal-observacao">Observações (opcional):</label><textarea id="modal-observacao" rows="2"></textarea></div>
+            <div class="modal-buttons">
+                <button id="btn-cancelar-personalizacao" onclick="fecharModalPersonalizacao()">Cancelar</button>
+                <button id="btn-confirmar-personalizacao">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    const cardapio = [
+        { nome: "Pastel de Carne", preco: 8.00, categoria: "Salgados", ingredientes: ["Carne Moída", "Ovo", "Azeitona"] },
+        { nome: "Pastel de Queijo", preco: 8.00, categoria: "Salgados", ingredientes: ["Mussarela", "Orégano"] },
+        { nome: "Pastel de Pizza", preco: 8.50, categoria: "Salgados", ingredientes: ["Mussarela", "Presunto", "Tomate", "Orégano"] },
+        { nome: "Pastel de Frango com Catupiry", preco: 9.00, categoria: "Salgados", ingredientes: ["Frango Desfiado", "Catupiry", "Milho"] },
+        { nome: "Pastel Doce de Chocolate", preco: 9.50, categoria: "Doces", ingredientes: ["Chocolate ao Leite"] },
+        { nome: "Pastel Romeu e Julieta", preco: 9.00, categoria: "Doces", ingredientes: ["Goiabada", "Queijo Branco"] },
+        { nome: "Refrigerante Lata", preco: 5.00, categoria: "Bebidas", ingredientes: [] },
+        { nome: "Água sem Gás", preco: 3.00, categoria: "Bebidas", ingredientes: [] },
+    ];
+    let carrinho = [];
+
+    function showPage(pageId) {
+        document.getElementById('first-page').style.display = 'none';
+        document.getElementById('main-app').style.display = 'none';
+        document.getElementById('order-summary-screen').style.display = 'none';
+        document.getElementById(pageId).style.display = 'block';
+    }
+
+    function filtrarPorCategoria(categoria) {
+        document.getElementById('menu-title').textContent = categoria === 'Todos' ? 'Nosso Cardápio Completo' : `Cardápio de ${categoria}`;
+        const itensFiltrados = categoria === 'Todos' ? cardapio : cardapio.filter(item => item.categoria === categoria);
+        carregarMenu(itensFiltrados);
+        showPage('main-app');
+    }
+
+    function carregarMenu(itensParaExibir) {
+        const menuLista = document.getElementById('menu-items');
+        menuLista.innerHTML = '';
+        itensParaExibir.forEach(item => {
+            const li = document.createElement('li');
+            li.className = 'menu-item';
+            let ingredientesHTML = '';
+            if (item.ingredientes && item.ingredientes.length > 0) {
+                ingredientesHTML = `<div class="ingredientes-descricao">${item.ingredientes.join(', ')}</div>`;
+            }
+            li.innerHTML = `<div><span>${item.nome} - R$ ${item.preco.toFixed(2)}</span>${ingredientesHTML}</div>
+                            <button class="btn-add" onclick="abrirModalPersonalizacao('${item.nome}')">Adicionar</button>`;
+            menuLista.appendChild(li);
+        });
+    }
+
+    function abrirModalPersonalizacao(nomeItem) {
+        const item = cardapio.find(i => i.nome === nomeItem);
+        if (!item) return;
+        if (item.ingredientes.length === 0) {
+            carrinho.push({ ...item, id: Date.now(), personalizacoes: { removidos: [], obs: '' } });
+            atualizarCarrinho();
+            alert(`'${item.nome}' foi adicionado ao seu pedido!`);
+            return;
+        }
+        const modal = document.getElementById('personalizacao-modal');
+        document.getElementById('modal-item-nome').textContent = `Personalizar ${item.nome}`;
+        const ingredientesListaEl = document.getElementById('modal-ingredientes-lista');
+        ingredientesListaEl.innerHTML = '';
+        item.ingredientes.forEach(ing => {
+            ingredientesListaEl.innerHTML += `<li><label><input type="checkbox" value="${ing}" checked> ${ing}</label></li>`;
+        });
+        document.getElementById('modal-observacao').value = '';
+        const btnConfirmar = document.getElementById('btn-confirmar-personalizacao');
+        btnConfirmar.onclick = () => adicionarItemPersonalizadoAoCarrinho(nomeItem);
+        modal.style.display = 'flex';
+    }
+
+    function fecharModalPersonalizacao() {
+        document.getElementById('personalizacao-modal').style.display = 'none';
+    }
+
+    function adicionarItemPersonalizadoAoCarrinho(nomeItem) {
+        const itemOriginal = cardapio.find(i => i.nome === nomeItem);
+        const removidos = Array.from(document.querySelectorAll('#modal-ingredientes-lista input:not(:checked)')).map(cb => cb.value);
+        const obs = document.getElementById('modal-observacao').value.trim();
+        carrinho.push({ ...itemOriginal, id: Date.now(), personalizacoes: { removidos, obs } });
+        atualizarCarrinho();
+        fecharModalPersonalizacao();
+    }
+
+    // --- MODIFICADO: Adicionado botão de remover ao lado de cada item ---
+    function atualizarCarrinho() {
+        const carrinhoLista = document.getElementById('carrinho-items');
+        carrinhoLista.innerHTML = '';
+        if (carrinho.length === 0) {
+            carrinhoLista.innerHTML = `<li>Seu carrinho está vazio.</li>`;
+        } else {
+            carrinho.forEach(item => {
+                let personalizacaoHTML = '';
+                const { removidos, obs } = item.personalizacoes;
+                if (removidos.length > 0) personalizacaoHTML += `<span class="personalizacao-texto">Sem: ${removidos.join(', ')}</span>`;
+                if (obs) personalizacaoHTML += `<span class="personalizacao-texto">Obs: ${obs}</span>`;
+                
+                const li = document.createElement('li');
+                li.className = 'carrinho-item-display';
+                li.innerHTML = `
+                    <div>
+                        <span>1x ${item.nome} - R$ ${item.preco.toFixed(2)}</span>
+                        ${personalizacaoHTML}
+                    </div>
+                    <button class="btn-remover" onclick="removerItemDoCarrinho(${item.id})">X</button>
+                `;
+                carrinhoLista.appendChild(li);
+            });
+        }
+        const total = carrinho.reduce((sum, item) => sum + item.preco, 0);
+        document.getElementById('total-valor').textContent = total.toFixed(2);
+    }
+    
+    // --- NOVA FUNÇÃO: Remover item do carrinho ---
+    function removerItemDoCarrinho(itemId) {
+        // Cria um novo carrinho contendo todos os itens, EXCETO aquele com o ID que queremos remover.
+        carrinho = carrinho.filter(item => item.id !== itemId);
+        // Re-desenha o carrinho na tela para refletir a remoção.
+        atualizarCarrinho();
+    }
+
+    function toggleEntrega() {
+        const isEntrega = document.getElementById('tipo-pedido').value === 'entrega';
+        document.getElementById('dados-entrega').style.display = isEntrega ? 'block' : 'none';
+        document.getElementById('dados-retirada').style.display = isEntrega ? 'none' : 'block';
+    }
+
+    function toggleTroco() {
+        document.getElementById('troco-group').style.display = document.getElementById('forma-pagamento').value === 'Dinheiro' ? 'block' : 'none';
+    }
+
+    function finalizarPedido() {
+        if (carrinho.length === 0) { alert("Seu carrinho está vazio!"); return; }
+        const tipo = document.getElementById('tipo-pedido').value;
+        const nome = document.getElementById('nome-cliente').value;
+        const endereco = document.getElementById('endereco-cliente').value;
+        if (tipo === 'retirada' && !nome) { alert("Por favor, digite seu nome para retirada."); return; }
+        if (tipo === 'entrega' && !endereco) { alert("Por favor, digite seu endereço para entrega."); return; }
+        let msg = `*NOVO PEDIDO - KA PASTÉIS E CREPES*\n\n`;
+        carrinho.forEach(item => {
+            msg += `*1x ${item.nome}* - R$ ${item.preco.toFixed(2)}\n`;
+            const { removidos, obs } = item.personalizacoes;
+            if (removidos.length > 0) msg += `  - Sem: ${removidos.join(', ')}\n`;
+            if (obs) msg += `  - Obs: ${obs}\n`;
+        });
+        msg += `\n*TOTAL:* R$ ${document.getElementById('total-valor').textContent}\n`;
+        msg += `*Pagamento:* ${document.getElementById('forma-pagamento').value}\n`;
+        if (document.getElementById('forma-pagamento').value === 'Dinheiro') {
+            const troco = document.getElementById('valor-troco').value;
+            if (troco) msg += `*Troco para:* R$ ${troco}\n`;
+        }
+        msg += `\n*${tipo === 'retirada' ? 'Retirar no nome de' : 'Entregar em'}:*\n${tipo === 'retirada' ? nome : endereco}`;
+        const numeroWhatsApp = "5516988724961"; // SUBSTITUA PELO SEU NÚMERO
+        const linkWhatsApp = `https://api.whatsapp.com/send?phone=${numeroWhatsApp}&text=${encodeURIComponent(msg)}`;
+        window.open(linkWhatsApp, '_blank');
+        showPage('order-summary-screen');
+    }
+
+    function resetApp() {
+        carrinho = [];
+        atualizarCarrinho();
+        document.getElementById('nome-cliente').value = '';
+        document.getElementById('endereco-cliente').value = '';
+        showPage('first-page');
+    }
+
+    window.onload = () => {
+        showPage('first-page');
+        toggleEntrega();
+    };
+    </script>
+</body>
+</html>

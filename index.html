@@ -8,6 +8,7 @@
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f8f9fa; margin: 0; padding: 20px; color: #343a40; }
         .container { max-width: 800px; margin: 0 auto; background-color: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
         h1, h2, h3 { text-align: center; color: #d9534f; }
+        h4 { color: #495057; margin-top: 20px; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;}
         ul { list-style: none; padding: 0; }
         .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #dee2e6; }
         .carrinho-item-display { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #dee2e6; }
@@ -34,28 +35,21 @@
         #order-summary-screen { display: none; text-align: center; }
         .ingredientes-descricao { font-size: 0.85em; color: #6c757d; margin-top: 4px; }
 
-        /* --- NOVO: Estilo para o botão de remover item do carrinho --- */
-        .btn-remover {
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            border-radius: 50%; /* Deixa o botão redondo */
-            width: 24px;
-            height: 24px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-left: 15px;
-            line-height: 24px; /* Centraliza o 'X' verticalmente */
-            padding: 0;
-            flex-shrink: 0; /* Impede que o botão seja espremido */
-        }
-        .btn-remover:hover {
-            background-color: #c82333;
-        }
-        .carrinho-item-display > div {
-            flex-grow: 1; /* Permite que o texto cresça e o botão fique no canto */
-        }
+        .carrinho-item-display > div:first-child { flex-grow: 1; }
+        .item-controls { display: flex; align-items: center; }
+        .btn-remover { background-color: #dc3545; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; font-weight: bold; cursor: pointer; margin-left: 15px; line-height: 24px; padding: 0; flex-shrink: 0; }
+        .btn-remover:hover { background-color: #c82333; }
+        .quantity-control button { background-color: #0d6efd; color: white; border: none; border-radius: 5px; width: 28px; height: 28px; font-size: 1.2em; font-weight: bold; cursor: pointer; }
+        .quantity-control button:hover { background-color: #0b5ed7; }
+        .quantity-control span { padding: 0 10px; font-weight: 500; font-size: 1.1em; }
 
+        #modal-adicionais-lista, #modal-ingredientes-lista {
+            max-height: 150px;
+            overflow-y: auto;
+            padding: 5px;
+            border: 1px solid #eee;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
@@ -100,9 +94,21 @@
     <div id="personalizacao-modal" class="modal">
         <div class="modal-content">
             <h3 id="modal-item-nome">Personalizar Item</h3>
-            <p>Desmarque os ingredientes que deseja remover:</p>
-            <ul id="modal-ingredientes-lista"></ul>
-            <div class="form-group"><label for="modal-observacao">Observações (opcional):</label><textarea id="modal-observacao" rows="2"></textarea></div>
+            
+            <div id="modal-remover-container">
+                <h4>Remover Ingredientes</h4>
+                <ul id="modal-ingredientes-lista"></ul>
+            </div>
+
+            <div id="modal-adicionais-container" style="display: none;">
+                <h4>Adicionar Ingredientes (R$ 4.00 cada)</h4>
+                <ul id="modal-adicionais-lista"></ul>
+            </div>
+
+            <div class="form-group" style="margin-top: 20px;">
+                <label for="modal-observacao">Observações (opcional):</label>
+                <textarea id="modal-observacao" rows="2"></textarea>
+            </div>
             <div class="modal-buttons">
                 <button id="btn-cancelar-personalizacao" onclick="fecharModalPersonalizacao()">Cancelar</button>
                 <button id="btn-confirmar-personalizacao">Confirmar</button>
@@ -111,15 +117,49 @@
     </div>
 
     <script>
+    // --- LISTA DE ADICIONAIS REAIS ---
+    const adicionaisDisponiveis = [
+        { nome: 'Bacon', preco: 4.00 },
+        { nome: 'Calabresa', preco: 4.00 },
+        { nome: 'Carne', preco: 4.00 },
+        { nome: 'Catupiry Scala', preco: 4.00 },
+        { nome: 'Cheddar', preco: 4.00 },
+        { nome: 'Frango', preco: 4.00 },
+        { nome: 'Milho', preco: 4.00 },
+        { nome: 'Ovo', preco: 4.00 },
+        { nome: 'Presunto', preco: 4.00 },
+        { nome: 'Queijo', preco: 4.00 },
+    ];
+
+    // --- CARDÁPIO REAL DA KÁ PASTÉIS ---
     const cardapio = [
-        { nome: "Pastel de Carne", preco: 8.00, categoria: "Salgados", ingredientes: ["Carne Moída", "Ovo", "Azeitona"] },
-        { nome: "Pastel de Queijo", preco: 8.00, categoria: "Salgados", ingredientes: ["Mussarela", "Orégano"] },
-        { nome: "Pastel de Pizza", preco: 8.50, categoria: "Salgados", ingredientes: ["Mussarela", "Presunto", "Tomate", "Orégano"] },
-        { nome: "Pastel de Frango com Catupiry", preco: 9.00, categoria: "Salgados", ingredientes: ["Frango Desfiado", "Catupiry", "Milho"] },
-        { nome: "Pastel Doce de Chocolate", preco: 9.50, categoria: "Doces", ingredientes: ["Chocolate ao Leite"] },
-        { nome: "Pastel Romeu e Julieta", preco: 9.00, categoria: "Doces", ingredientes: ["Goiabada", "Queijo Branco"] },
-        { nome: "Refrigerante Lata", preco: 5.00, categoria: "Bebidas", ingredientes: [] },
-        { nome: "Água sem Gás", preco: 3.00, categoria: "Bebidas", ingredientes: [] },
+        // SALGADOS
+        { nome: "Queijo", preco: 10.00, categoria: "Salgados", ingredientes: ["Queijo"], permiteAdicionais: true },
+        { nome: "Presunto e Queijo", preco: 13.00, categoria: "Salgados", ingredientes: ["Presunto", "Queijo"], permiteAdicionais: true },
+        { nome: "Dois Queijos", preco: 14.00, categoria: "Salgados", ingredientes: ["Queijo", "Catupiry Scala"], permiteAdicionais: true },
+        { nome: "Pizza", preco: 14.00, categoria: "Salgados", ingredientes: ["Presunto", "Queijo", "Tomate", "Orégano"], permiteAdicionais: true },
+        { nome: "Frango", preco: 13.00, categoria: "Salgados", ingredientes: ["Frango"], permiteAdicionais: true },
+        { nome: "Frango com Catupiry Scala", preco: 16.00, categoria: "Salgados", ingredientes: ["Frango", "Catupiry Scala"], permiteAdicionais: true },
+        { nome: "Palmito", preco: 15.00, categoria: "Salgados", ingredientes: ["Palmito Cremoso", "Ervilha", "Azeitona"], permiteAdicionais: true },
+        { nome: "Carne", preco: 15.00, categoria: "Salgados", ingredientes: ["Carne"], permiteAdicionais: true },
+        { nome: "Carne e Queijo", preco: 17.00, categoria: "Salgados", ingredientes: ["Carne", "Queijo"], permiteAdicionais: true },
+        { nome: "Calabresa", preco: 17.00, categoria: "Salgados", ingredientes: ["Calabresa", "Queijo", "Tomate", "Orégano"], permiteAdicionais: true },
+        { nome: "Pastel Hot Dog", preco: 15.00, categoria: "Salgados", ingredientes: ["Salsicha", "Ketchup", "Mostarda"], permiteAdicionais: true },
+        { nome: "Bauru", preco: 17.00, categoria: "Salgados", ingredientes: ["Presunto", "Queijo", "Bacon", "Milho", "Tomate", "Catupiry Scala"], permiteAdicionais: true },
+        { nome: "Pastel da Ká", preco: 19.00, categoria: "Salgados", ingredientes: ["Frango", "Presunto", "Queijo", "Bacon", "Tomate", "Orégano", "Catupiry Scala"], permiteAdicionais: true },
+        { nome: "Rúcula", preco: 17.00, categoria: "Salgados", ingredientes: ["Rúcula", "Queijo", "Bacon", "Tomate", "Orégano"], permiteAdicionais: true },
+        { nome: "Brócolis", preco: 17.00, categoria: "Salgados", ingredientes: ["Brócolis", "Queijo", "Bacon"], permiteAdicionais: true },
+        
+        // DOCES
+        { nome: "Banana com Canela", preco: 15.00, categoria: "Doces", ingredientes: ["Banana", "Canela"], permiteAdicionais: true },
+        { nome: "Banoffe", preco: 17.00, categoria: "Doces", ingredientes: ["Banana", "Doce de Leite", "Canela"], permiteAdicionais: true },
+        { nome: "Doce de Leite", preco: 15.00, categoria: "Doces", ingredientes: ["Doce de Leite"], permiteAdicionais: true },
+        { nome: "Chocolate", preco: 15.00, categoria: "Doces", ingredientes: ["Chocolate"], permiteAdicionais: true },
+        { nome: "Nutella", preco: 17.00, categoria: "Doces", ingredientes: ["Nutella"], permiteAdicionais: true },
+
+        // BEBIDAS (Mantive exemplos, pode alterar se precisar)
+        { nome: "Refrigerante Lata", preco: 5.00, categoria: "Bebidas", ingredientes: [], permiteAdicionais: false },
+        { nome: "Água sem Gás", preco: 3.00, categoria: "Bebidas", ingredientes: [], permiteAdicionais: false },
     ];
     let carrinho = [];
 
@@ -153,25 +193,61 @@
         });
     }
 
+    function gerarIdUnicoDoItem(item, personalizacoes) {
+        const nomeBase = item.nome.replace(/\s+/g, '-');
+        const removidosStr = [...personalizacoes.removidos].sort().join(',');
+        const adicionadosStr = [...personalizacoes.adicionados.map(a => a.nome)].sort().join(',');
+        const obsStr = personalizacoes.obs;
+        return `${nomeBase}|rem:${removidosStr}|add:${adicionadosStr}|obs:${obsStr}`;
+    }
+
     function abrirModalPersonalizacao(nomeItem) {
         const item = cardapio.find(i => i.nome === nomeItem);
         if (!item) return;
-        if (item.ingredientes.length === 0) {
-            carrinho.push({ ...item, id: Date.now(), personalizacoes: { removidos: [], obs: '' } });
-            atualizarCarrinho();
+
+        if (!item.permiteAdicionais && item.ingredientes.length === 0) {
+            const personalizacoes = { removidos: [], adicionados: [], obs: '' };
+            adicionarItemAoCarrinho(item, personalizacoes);
             alert(`'${item.nome}' foi adicionado ao seu pedido!`);
             return;
         }
+
         const modal = document.getElementById('personalizacao-modal');
         document.getElementById('modal-item-nome').textContent = `Personalizar ${item.nome}`;
-        const ingredientesListaEl = document.getElementById('modal-ingredientes-lista');
-        ingredientesListaEl.innerHTML = '';
-        item.ingredientes.forEach(ing => {
-            ingredientesListaEl.innerHTML += `<li><label><input type="checkbox" value="${ing}" checked> ${ing}</label></li>`;
-        });
+        
+        const removerContainer = document.getElementById('modal-remover-container');
+        if (item.ingredientes.length > 0) {
+            const ingredientesListaEl = document.getElementById('modal-ingredientes-lista');
+            ingredientesListaEl.innerHTML = '';
+            item.ingredientes.forEach(ing => {
+                ingredientesListaEl.innerHTML += `<li><label><input type="checkbox" value="${ing}" checked> ${ing}</label></li>`;
+            });
+            removerContainer.style.display = 'block';
+        } else {
+            removerContainer.style.display = 'none';
+        }
+
+        const adicionaisContainer = document.getElementById('modal-adicionais-container');
+        if (item.permiteAdicionais) {
+            const adicionaisListaEl = document.getElementById('modal-adicionais-lista');
+            adicionaisListaEl.innerHTML = '';
+            adicionaisDisponiveis.forEach(ad => {
+                adicionaisListaEl.innerHTML += `<li><label><input type="checkbox" value="${ad.nome}" data-preco="${ad.preco}"> ${ad.nome} (+ R$ ${ad.preco.toFixed(2)})</label></li>`;
+            });
+            adicionaisContainer.style.display = 'block';
+        } else {
+            adicionaisContainer.style.display = 'none';
+        }
+
         document.getElementById('modal-observacao').value = '';
         const btnConfirmar = document.getElementById('btn-confirmar-personalizacao');
-        btnConfirmar.onclick = () => adicionarItemPersonalizadoAoCarrinho(nomeItem);
+        btnConfirmar.onclick = () => {
+            const removidos = Array.from(document.querySelectorAll('#modal-ingredientes-lista input:not(:checked)')).map(cb => cb.value);
+            const adicionados = Array.from(document.querySelectorAll('#modal-adicionais-lista input:checked')).map(cb => ({ nome: cb.value, preco: parseFloat(cb.dataset.preco) }));
+            const obs = document.getElementById('modal-observacao').value.trim();
+            adicionarItemAoCarrinho(item, { removidos, adicionados, obs });
+            fecharModalPersonalizacao();
+        };
         modal.style.display = 'flex';
     }
 
@@ -179,16 +255,27 @@
         document.getElementById('personalizacao-modal').style.display = 'none';
     }
 
-    function adicionarItemPersonalizadoAoCarrinho(nomeItem) {
-        const itemOriginal = cardapio.find(i => i.nome === nomeItem);
-        const removidos = Array.from(document.querySelectorAll('#modal-ingredientes-lista input:not(:checked)')).map(cb => cb.value);
-        const obs = document.getElementById('modal-observacao').value.trim();
-        carrinho.push({ ...itemOriginal, id: Date.now(), personalizacoes: { removidos, obs } });
-        atualizarCarrinho();
-        fecharModalPersonalizacao();
-    }
+    function adicionarItemAoCarrinho(itemOriginal, personalizacoes) {
+        const precoAdicionais = personalizacoes.adicionados.reduce((sum, ad) => sum + ad.preco, 0);
+        const precoFinal = itemOriginal.preco + precoAdicionais;
+        
+        const idUnico = gerarIdUnicoDoItem(itemOriginal, personalizacoes);
+        const itemExistente = carrinho.find(item => item.id === idUnico);
 
-    // --- MODIFICADO: Adicionado botão de remover ao lado de cada item ---
+        if (itemExistente) {
+            itemExistente.quantidade++;
+        } else {
+            carrinho.push({
+                ...itemOriginal,
+                id: idUnico,
+                quantidade: 1,
+                personalizacoes: personalizacoes,
+                precoFinal: precoFinal
+            });
+        }
+        atualizarCarrinho();
+    }
+    
     function atualizarCarrinho() {
         const carrinhoLista = document.getElementById('carrinho-items');
         carrinhoLista.innerHTML = '';
@@ -197,31 +284,48 @@
         } else {
             carrinho.forEach(item => {
                 let personalizacaoHTML = '';
-                const { removidos, obs } = item.personalizacoes;
-                if (removidos.length > 0) personalizacaoHTML += `<span class="personalizacao-texto">Sem: ${removidos.join(', ')}</span>`;
+                const { removidos, adicionados, obs } = item.personalizacoes;
+                if (removidos.length > 0) personalizacaoHTML += `<span class="personalizacao-texto" style="color: #dc3545;">Sem: ${removidos.join(', ')}</span>`;
+                if (adicionados.length > 0) personalizacaoHTML += `<span class="personalizacao-texto" style="color: #28a745;">Com: ${adicionados.map(a => a.nome).join(', ')}</span>`;
                 if (obs) personalizacaoHTML += `<span class="personalizacao-texto">Obs: ${obs}</span>`;
                 
                 const li = document.createElement('li');
                 li.className = 'carrinho-item-display';
                 li.innerHTML = `
                     <div>
-                        <span>1x ${item.nome} - R$ ${item.preco.toFixed(2)}</span>
+                        <span>${item.quantidade}x ${item.nome} - R$ ${(item.precoFinal * item.quantidade).toFixed(2)}</span>
                         ${personalizacaoHTML}
                     </div>
-                    <button class="btn-remover" onclick="removerItemDoCarrinho(${item.id})">X</button>
+                    <div class="item-controls">
+                        <div class="quantity-control">
+                            <button onclick="mudarQuantidade('${item.id}', -1)">-</button>
+                            <span>${item.quantidade}</span>
+                            <button onclick="mudarQuantidade('${item.id}', 1)">+</button>
+                        </div>
+                        <button class="btn-remover" onclick="removerItemDoCarrinho('${item.id}')">X</button>
+                    </div>
                 `;
                 carrinhoLista.appendChild(li);
             });
         }
-        const total = carrinho.reduce((sum, item) => sum + item.preco, 0);
+        const total = carrinho.reduce((sum, item) => sum + (item.precoFinal * item.quantidade), 0);
         document.getElementById('total-valor').textContent = total.toFixed(2);
     }
     
-    // --- NOVA FUNÇÃO: Remover item do carrinho ---
+    function mudarQuantidade(itemId, change) {
+        const item = carrinho.find(i => i.id === itemId);
+        if (item) {
+            item.quantidade += change;
+            if (item.quantidade <= 0) {
+                removerItemDoCarrinho(itemId);
+            } else {
+                atualizarCarrinho();
+            }
+        }
+    }
+
     function removerItemDoCarrinho(itemId) {
-        // Cria um novo carrinho contendo todos os itens, EXCETO aquele com o ID que queremos remover.
         carrinho = carrinho.filter(item => item.id !== itemId);
-        // Re-desenha o carrinho na tela para refletir a remoção.
         atualizarCarrinho();
     }
 
@@ -242,13 +346,16 @@
         const endereco = document.getElementById('endereco-cliente').value;
         if (tipo === 'retirada' && !nome) { alert("Por favor, digite seu nome para retirada."); return; }
         if (tipo === 'entrega' && !endereco) { alert("Por favor, digite seu endereço para entrega."); return; }
+        
         let msg = `*NOVO PEDIDO - KA PASTÉIS E CREPES*\n\n`;
         carrinho.forEach(item => {
-            msg += `*1x ${item.nome}* - R$ ${item.preco.toFixed(2)}\n`;
-            const { removidos, obs } = item.personalizacoes;
+            msg += `*${item.quantidade}x ${item.nome}* - R$ ${(item.precoFinal * item.quantidade).toFixed(2)}\n`;
+            const { removidos, adicionados, obs } = item.personalizacoes;
             if (removidos.length > 0) msg += `  - Sem: ${removidos.join(', ')}\n`;
+            if (adicionados.length > 0) msg += `  - Com: ${adicionados.map(a => a.nome).join(', ')}\n`;
             if (obs) msg += `  - Obs: ${obs}\n`;
         });
+        
         msg += `\n*TOTAL:* R$ ${document.getElementById('total-valor').textContent}\n`;
         msg += `*Pagamento:* ${document.getElementById('forma-pagamento').value}\n`;
         if (document.getElementById('forma-pagamento').value === 'Dinheiro') {
@@ -256,8 +363,10 @@
             if (troco) msg += `*Troco para:* R$ ${troco}\n`;
         }
         msg += `\n*${tipo === 'retirada' ? 'Retirar no nome de' : 'Entregar em'}:*\n${tipo === 'retirada' ? nome : endereco}`;
-        const numeroWhatsApp = "5516988724961"; // SUBSTITUA PELO SEU NÚMERO
+        
+        const numeroWhatsApp = "5516988724961"; // NÚMERO ATUALIZADO DO CARDÁPIO
         const linkWhatsApp = `https://api.whatsapp.com/send?phone=${numeroWhatsApp}&text=${encodeURIComponent(msg)}`;
+        
         window.open(linkWhatsApp, '_blank');
         showPage('order-summary-screen');
     }
@@ -273,7 +382,9 @@
     window.onload = () => {
         showPage('first-page');
         toggleEntrega();
+        atualizarCarrinho();
     };
     </script>
 </body>
 </html>
+

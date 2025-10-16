@@ -75,8 +75,8 @@
                 <h2>Seu Pedido</h2>
                 <ul id="carrinho-items"></ul>
                 <div class="total-carrinho">Total: R$ <span id="total-valor">0.00</span></div>
-                <div class="form-group"><label for="tipo-pedido">Tipo de Pedido:</label><select id="tipo-pedido" onchange="toggleEntrega()"><option value="retirada">Retirar no Local</option><option value="entrega">Delivery</option></select></div>
-                <div id="dados-retirada" class="form-group"><label for="nome-cliente">Seu Nome:</label><input type="text" id="nome-cliente" placeholder="Digite seu nome"></div>
+                <div class="form-group"><label for="tipo-pedido">Tipo de Pedido:</label><select id="tipo-pedido" onchange="toggleEntrega()"><option value="retirada">Retirar no Local</option><option value="entrega">Delivery (Taxa R$ 8,50)</option></select></div>
+                <div class="form-group"><label for="nome-cliente">Seu Nome:</label><input type="text" id="nome-cliente" placeholder="Digite seu nome"></div>
                 <div id="dados-entrega" class="form-group"><label for="endereco-cliente">Endereço de Entrega:</label><input type="text" id="endereco-cliente" placeholder="Rua, Número, Bairro"></div>
                 <div class="form-group"><label for="forma-pagamento">Forma de Pagamento:</label><select id="forma-pagamento" onchange="toggleTroco()"><option value="Dinheiro">Dinheiro</option><option value="Cartão">Cartão</option><option value="Pix">Pix</option></select></div>
                 <div id="troco-group" class="form-group"><label for="valor-troco">Troco para quanto?</label><input type="number" id="valor-troco" placeholder="Ex: 50.00"></div>
@@ -123,10 +123,8 @@
         { nome: 'Calabresa', preco: 4.00 },
         { nome: 'Carne', preco: 4.00 },
         { nome: 'Catupiry Scala', preco: 4.00 },
-        { nome: 'Cheddar', preco: 4.00 },
         { nome: 'Frango', preco: 4.00 },
         { nome: 'Milho', preco: 4.00 },
-        { nome: 'Ovo', preco: 4.00 },
         { nome: 'Presunto', preco: 4.00 },
         { nome: 'Queijo', preco: 4.00 },
     ];
@@ -157,11 +155,12 @@
         { nome: "Chocolate", preco: 15.00, categoria: "Doces", ingredientes: ["Chocolate"], permiteAdicionais: true },
         { nome: "Nutella", preco: 17.00, categoria: "Doces", ingredientes: ["Nutella"], permiteAdicionais: true },
 
-        // BEBIDAS (Mantive exemplos, pode alterar se precisar)
+        // BEBIDAS
         { nome: "Refrigerante Lata", preco: 5.00, categoria: "Bebidas", ingredientes: [], permiteAdicionais: false },
         { nome: "Água sem Gás", preco: 3.00, categoria: "Bebidas", ingredientes: [], permiteAdicionais: false },
     ];
     let carrinho = [];
+    const taxaEntrega = 8.50;
 
     function showPage(pageId) {
         document.getElementById('first-page').style.display = 'none';
@@ -208,7 +207,12 @@
         if (!item.permiteAdicionais && item.ingredientes.length === 0) {
             const personalizacoes = { removidos: [], adicionados: [], obs: '' };
             adicionarItemAoCarrinho(item, personalizacoes);
-            alert(`'${item.nome}' foi adicionado ao seu pedido!`);
+            // Simple feedback without using alert
+            const btn = document.querySelector(`.btn-add[onclick="abrirModalPersonalizacao('${item.nome}')"]`);
+            if(btn) {
+                btn.textContent = 'Adicionado!';
+                setTimeout(() => { btn.textContent = 'Adicionar'; }, 1500);
+            }
             return;
         }
 
@@ -279,6 +283,7 @@
     function atualizarCarrinho() {
         const carrinhoLista = document.getElementById('carrinho-items');
         carrinhoLista.innerHTML = '';
+        
         if (carrinho.length === 0) {
             carrinhoLista.innerHTML = `<li>Seu carrinho está vazio.</li>`;
         } else {
@@ -308,8 +313,20 @@
                 carrinhoLista.appendChild(li);
             });
         }
-        const total = carrinho.reduce((sum, item) => sum + (item.precoFinal * item.quantidade), 0);
-        document.getElementById('total-valor').textContent = total.toFixed(2);
+        
+        const totalItens = carrinho.reduce((sum, item) => sum + (item.precoFinal * item.quantidade), 0);
+        let totalFinal = totalItens;
+        const isEntrega = document.getElementById('tipo-pedido').value === 'entrega';
+
+        if (isEntrega && carrinho.length > 0) {
+            const liEntrega = document.createElement('li');
+            liEntrega.className = 'carrinho-item-display';
+            liEntrega.innerHTML = `<div style="font-weight: 500;">Taxa de Entrega</div><div style="font-weight: 500;">R$ ${taxaEntrega.toFixed(2)}</div>`;
+            carrinhoLista.appendChild(liEntrega);
+            totalFinal += taxaEntrega;
+        }
+        
+        document.getElementById('total-valor').textContent = totalFinal.toFixed(2);
     }
     
     function mudarQuantidade(itemId, change) {
@@ -332,20 +349,41 @@
     function toggleEntrega() {
         const isEntrega = document.getElementById('tipo-pedido').value === 'entrega';
         document.getElementById('dados-entrega').style.display = isEntrega ? 'block' : 'none';
-        document.getElementById('dados-retirada').style.display = isEntrega ? 'none' : 'block';
+        atualizarCarrinho();
+        toggleTroco(); // Adicionado para reavaliar a exibição do troco
     }
 
     function toggleTroco() {
-        document.getElementById('troco-group').style.display = document.getElementById('forma-pagamento').value === 'Dinheiro' ? 'block' : 'none';
+        const isDinheiro = document.getElementById('forma-pagamento').value === 'Dinheiro';
+        const isEntrega = document.getElementById('tipo-pedido').value === 'entrega';
+        // Mostra o campo de troco apenas se for delivery E pagamento em dinheiro
+        document.getElementById('troco-group').style.display = isDinheiro && isEntrega ? 'block' : 'none';
     }
 
     function finalizarPedido() {
-        if (carrinho.length === 0) { alert("Seu carrinho está vazio!"); return; }
+        if (carrinho.length === 0) { 
+            // Replace alert with a more modern notification if possible
+            const btn = document.querySelector('.btn-finalizar');
+            btn.style.backgroundColor = '#dc3545';
+            btn.textContent = 'Seu carrinho está vazio!';
+            setTimeout(() => {
+                btn.style.backgroundColor = '#d9534f';
+                btn.textContent = 'Finalizar Pedido';
+            }, 2000);
+            return;
+        }
         const tipo = document.getElementById('tipo-pedido').value;
-        const nome = document.getElementById('nome-cliente').value;
-        const endereco = document.getElementById('endereco-cliente').value;
-        if (tipo === 'retirada' && !nome) { alert("Por favor, digite seu nome para retirada."); return; }
-        if (tipo === 'entrega' && !endereco) { alert("Por favor, digite seu endereço para entrega."); return; }
+        const nome = document.getElementById('nome-cliente').value.trim();
+        const endereco = document.getElementById('endereco-cliente').value.trim();
+        
+        if (!nome) { 
+            alert("Por favor, digite seu nome."); 
+            return; 
+        }
+        if (tipo === 'entrega' && !endereco) { 
+            alert("Por favor, digite seu endereço para entrega."); 
+            return; 
+        }
         
         let msg = `*NOVO PEDIDO - KA PASTÉIS E CREPES*\n\n`;
         carrinho.forEach(item => {
@@ -356,13 +394,25 @@
             if (obs) msg += `  - Obs: ${obs}\n`;
         });
         
+        const subtotalItens = carrinho.reduce((sum, item) => sum + (item.precoFinal * item.quantidade), 0);
+        if (tipo === 'entrega') {
+            msg += `\n*Subtotal dos Itens:* R$ ${subtotalItens.toFixed(2)}\n`;
+            msg += `*Taxa de Entrega:* R$ ${taxaEntrega.toFixed(2)}\n`;
+        }
+        
         msg += `\n*TOTAL:* R$ ${document.getElementById('total-valor').textContent}\n`;
         msg += `*Pagamento:* ${document.getElementById('forma-pagamento').value}\n`;
         if (document.getElementById('forma-pagamento').value === 'Dinheiro') {
             const troco = document.getElementById('valor-troco').value;
-            if (troco) msg += `*Troco para:* R$ ${troco}\n`;
+            if (troco) msg += `*Troco para:* R$ ${parseFloat(troco).toFixed(2)}\n`;
         }
-        msg += `\n*${tipo === 'retirada' ? 'Retirar no nome de' : 'Entregar em'}:*\n${tipo === 'retirada' ? nome : endereco}`;
+        
+        msg += `\n*Cliente:* ${nome}\n`;
+        if (tipo === 'entrega') {
+            msg += `*Entregar em:* ${endereco}`;
+        } else {
+            msg += `*Pedido para Retirada*`;
+        }
         
         const numeroWhatsApp = "5516988724961"; // NÚMERO ATUALIZADO DO CARDÁPIO
         const linkWhatsApp = `https://api.whatsapp.com/send?phone=${numeroWhatsApp}&text=${encodeURIComponent(msg)}`;
@@ -373,15 +423,18 @@
 
     function resetApp() {
         carrinho = [];
-        atualizarCarrinho();
         document.getElementById('nome-cliente').value = '';
         document.getElementById('endereco-cliente').value = '';
+        document.getElementById('tipo-pedido').value = 'retirada';
+        atualizarCarrinho();
+        toggleEntrega();
         showPage('first-page');
     }
 
     window.onload = () => {
         showPage('first-page');
         toggleEntrega();
+        toggleTroco();
         atualizarCarrinho();
     };
     </script>

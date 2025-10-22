@@ -9,6 +9,9 @@
         .container { max-width: 800px; margin: 0 auto; background-color: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
         h1, h2, h3 { text-align: center; color: #d9534f; }
         h4 { color: #495057; margin-top: 20px; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;}
+        
+        /* Estilo para o logo REMOVIDO */
+
         ul { list-style: none; padding: 0; }
         .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #dee2e6; }
         .carrinho-item-display { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #dee2e6; }
@@ -18,7 +21,7 @@
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
         .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ced4da; border-radius: 5px; font-size: 1em; }
-        .btn-finalizar, .btn-primary { width: 100%; background-color: #d9534f; color: white; border: none; padding: 15px; font-size: 1.2em; border-radius: 5px; cursor: pointer; margin-top: 10px; transition: background-color 0.2s; }
+        .btn-finalizar, .btn-primary { width: 100%; background-color: #d9534f; color: white; border: none; padding: 15px; font-size: 1.2em; border-radius: 5px; cursor: pointer; margin-top: 10px; transition: background-color 0.2s, color 0.2s; }
         .btn-finalizar:hover, .btn-primary:hover { background-color: #c9302c; }
         #dados-entrega, #troco-group { display: none; }
         #first-page { text-align: center; }
@@ -58,6 +61,8 @@
         <h1>KA PASTÉIS E CREPES</h1>
         
         <div id="first-page">
+            <!-- Logo REMOVIDO -->
+
             <h2>Seja Bem-vindo!</h2>
             <div class="category-buttons">
                 <button onclick="filtrarPorCategoria('Salgados')">Pastéis Salgados</button>
@@ -127,6 +132,8 @@
         { nome: 'Milho', preco: 4.00 },
         { nome: 'Presunto', preco: 4.00 },
         { nome: 'Queijo', preco: 4.00 },
+        { nome: 'Brócolis', preco: 4.00 },
+        { nome: 'Nutella', preco: 4.00 },
     ];
 
     // --- CARDÁPIO REAL DA KÁ PASTÉIS ---
@@ -142,7 +149,7 @@
         { nome: "Carne", preco: 15.00, categoria: "Salgados", ingredientes: ["Carne"], permiteAdicionais: true },
         { nome: "Carne e Queijo", preco: 17.00, categoria: "Salgados", ingredientes: ["Carne", "Queijo"], permiteAdicionais: true },
         { nome: "Calabresa", preco: 17.00, categoria: "Salgados", ingredientes: ["Calabresa", "Queijo", "Tomate", "Orégano"], permiteAdicionais: true },
-        { nome: "Pastel Hot Dog", preco: 15.00, categoria: "Salgados", ingredientes: ["Salsicha", "Ketchup", "Mostarda"], permiteAdicionais: true },
+        { nome: "Pastel Hot Dog", preco: 15.00, categoria: "Salgados", ingredientes: ["Salsicha", "Ketchup", "Mostarda", "Maionese", "Batata Palha"], permiteAdicionais: true },
         { nome: "Bauru", preco: 17.00, categoria: "Salgados", ingredientes: ["Presunto", "Queijo", "Bacon", "Milho", "Tomate", "Catupiry Scala"], permiteAdicionais: true },
         { nome: "Pastel da Ká", preco: 19.00, categoria: "Salgados", ingredientes: ["Frango", "Presunto", "Queijo", "Bacon", "Tomate", "Orégano", "Catupiry Scala"], permiteAdicionais: true },
         { nome: "Brócolis", preco: 17.00, categoria: "Salgados", ingredientes: ["Brócolis", "Queijo", "Bacon"], permiteAdicionais: true },
@@ -172,9 +179,33 @@
         document.getElementById(pageId).style.display = 'block';
     }
 
+    // --- FUNÇÃO ATUALIZADA ---
     function filtrarPorCategoria(categoria) {
-        document.getElementById('menu-title').textContent = categoria === 'Todos' ? 'Nosso Cardápio Completo' : `Cardápio de ${categoria}`;
-        const itensFiltrados = categoria === 'Todos' ? cardapio : cardapio.filter(item => item.categoria === categoria);
+        let itensFiltrados = [];
+        let titulo = '';
+
+        if (categoria === 'Salgados') {
+            // Ao clicar em Salgados, mostra Salgados E Doces
+            titulo = 'Pastéis Salgados e Doces';
+            itensFiltrados = cardapio.filter(item => item.categoria === 'Salgados' || item.categoria === 'Doces');
+        
+        } else if (categoria === 'Doces') {
+            // Botão Doces continua mostrando apenas Doces
+            titulo = 'Cardápio de Pastéis Doces';
+            itensFiltrados = cardapio.filter(item => item.categoria === categoria);
+        
+        } else if (categoria === 'Bebidas') {
+            // Botão Bebidas continua mostrando apenas Bebidas
+            titulo = 'Cardápio de Bebidas';
+            itensFiltrados = cardapio.filter(item => item.categoria === categoria);
+        
+        } else { // 'Todos'
+            // Botão Todos mostra tudo
+            titulo = 'Nosso Cardápio Completo';
+            itensFiltrados = cardapio;
+        }
+
+        document.getElementById('menu-title').textContent = titulo;
         carregarMenu(itensFiltrados);
         showPage('main-app');
     }
@@ -190,7 +221,7 @@
                 ingredientesHTML = `<div class="ingredientes-descricao">${item.ingredientes.join(', ')}</div>`;
             }
             li.innerHTML = `<div><span>${item.nome} - R$ ${item.preco.toFixed(2)}</span>${ingredientesHTML}</div>
-                                <button class="btn-add" onclick="abrirModalPersonalizacao('${item.nome}')">Adicionar</button>`;
+                            <button class="btn-add" onclick="abrirModalPersonalizacao('${item.nome}')">Adicionar</button>`;
             menuLista.appendChild(li);
         });
     }
@@ -207,10 +238,12 @@
         const item = cardapio.find(i => i.nome === nomeItem);
         if (!item) return;
 
+        // Se o item não permite adicionais E não tem ingredientes (ex: Bebida), adiciona direto
         if (!item.permiteAdicionais && item.ingredientes.length === 0) {
             const personalizacoes = { removidos: [], adicionados: [], obs: '' };
             adicionarItemAoCarrinho(item, personalizacoes);
-            // Simple feedback without using alert
+            
+            // Feedback visual rápido no botão
             const btn = document.querySelector(`.btn-add[onclick="abrirModalPersonalizacao('${item.nome}')"]`);
             if(btn) {
                 btn.textContent = 'Adicionado!';
@@ -353,44 +386,56 @@
         const isEntrega = document.getElementById('tipo-pedido').value === 'entrega';
         document.getElementById('dados-entrega').style.display = isEntrega ? 'block' : 'none';
         atualizarCarrinho();
-        toggleTroco(); // Adicionado para reavaliar a exibição do troco
+        toggleTroco(); // Reavaliar a exibição do troco
     }
 
+    // --- FUNÇÃO CORRIGIDA ---
     function toggleTroco() {
         const isDinheiro = document.getElementById('forma-pagamento').value === 'Dinheiro';
-        const isEntrega = document.getElementById('tipo-pedido').value === 'entrega';
-        // Mostra o campo de troco apenas se for delivery E pagamento em dinheiro
-        document.getElementById('troco-group').style.display = isDinheiro && isEntrega ? 'block' : 'none';
+        // Mostra o campo de troco sempre que for pagamento em dinheiro
+        document.getElementById('troco-group').style.display = isDinheiro ? 'block' : 'none';
     }
 
+    // --- FUNÇÃO CORRIGIDA (SEM ALERTS) ---
     function finalizarPedido() {
-        if (carrinho.length === 0) { 
-            const btn = document.querySelector('.btn-finalizar');
-            btn.style.backgroundColor = '#dc3545';
-            btn.textContent = 'Seu carrinho está vazio!';
+        const btnFinalizar = document.querySelector('.btn-finalizar');
+        const originalBtnText = 'Finalizar Pedido';
+        const originalBtnColor = '#d9534f';
+        const errorColor = '#dc3545'; // Cor de erro
+
+        // Função auxiliar para mostrar erros no botão
+        const showError = (message) => {
+            btnFinalizar.style.backgroundColor = errorColor;
+            btnFinalizar.textContent = message;
             setTimeout(() => {
-                btn.style.backgroundColor = '#d9534f';
-                btn.textContent = 'Finalizar Pedido';
-            }, 2000);
+                btnFinalizar.style.backgroundColor = originalBtnColor;
+                btnFinalizar.textContent = originalBtnText;
+            }, 2500); // Reverte após 2.5 segundos
+        };
+
+        if (carrinho.length === 0) { 
+            showError('Seu carrinho está vazio!');
             return;
         }
+        
         const tipo = document.getElementById('tipo-pedido').value;
         const nome = document.getElementById('nome-cliente').value.trim();
         const endereco = document.getElementById('endereco-cliente').value.trim();
         
         if (!nome) { 
-            alert("Por favor, digite seu nome."); 
+            showError('Por favor, digite seu nome.');
+            document.getElementById('nome-cliente').focus();
             return; 
         }
         if (tipo === 'entrega' && !endereco) { 
-            alert("Por favor, digite seu endereço para entrega."); 
+            showError('Digite seu endereço para entrega.');
+            document.getElementById('endereco-cliente').focus();
             return; 
         }
         
         let msg = `*NOVO PEDIDO - KA PASTÉIS E CREPES*\n`;
         const separador = '--------------------------------------\n';
 
-        // --- MUDANÇA APLICADA AQUI ---
         // Adiciona a data e a hora do pedido
         const now = new Date();
         const dataPedido = now.toLocaleDateString('pt-BR');
@@ -406,7 +451,6 @@
             if (adicionados.length > 0) msg += `  - Com: ${adicionados.map(a => a.nome).join(', ')}\n`;
             if (obs) msg += `  - Obs: ${obs}\n`;
 
-            // Adiciona o separador entre os itens
             if (index < carrinho.length - 1) {
                 msg += `\n${separador}\n`;
             }
@@ -452,6 +496,8 @@
         document.getElementById('nome-cliente').value = '';
         document.getElementById('endereco-cliente').value = '';
         document.getElementById('tipo-pedido').value = 'retirada';
+        document.getElementById('forma-pagamento').value = 'Dinheiro'; // Reseta pagamento
+        document.getElementById('valor-troco').value = ''; // Limpa troco
         atualizarCarrinho();
         toggleEntrega();
         showPage('first-page');
@@ -460,10 +506,9 @@
     window.onload = () => {
         showPage('first-page');
         toggleEntrega();
-        toggleTroco();
+        toggleTroco(); // Garante que o estado inicial do troco esteja correto
         atualizarCarrinho();
     };
     </script>
 </body>
 </html>
-

@@ -10,8 +10,6 @@
         h1, h2, h3 { text-align: center; color: #d9534f; }
         h4 { color: #495057; margin-top: 20px; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;}
         
-        /* Estilo para o logo REMOVIDO */
-
         ul { list-style: none; padding: 0; }
         .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #dee2e6; }
         .carrinho-item-display { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #dee2e6; }
@@ -61,8 +59,6 @@
         <h1>KA PASTÉIS E CREPES</h1>
         
         <div id="first-page">
-            <!-- Logo REMOVIDO -->
-
             <h2>Seja Bem-vindo!</h2>
             <div class="category-buttons">
                 <button onclick="filtrarPorCategoria('Salgados')">Pastéis Salgados</button>
@@ -80,7 +76,13 @@
                 <h2>Seu Pedido</h2>
                 <ul id="carrinho-items"></ul>
                 <div class="total-carrinho">Total: R$ <span id="total-valor">0.00</span></div>
-                <div class="form-group"><label for="tipo-pedido">Tipo de Pedido:</label><select id="tipo-pedido" onchange="toggleEntrega()"><option value="retirada">Retirar no Local</option><option value="entrega">Delivery (Taxa R$ 8,50)</option></select></div>
+                <div class="form-group">
+                    <label for="tipo-pedido">Tipo de Pedido:</label>
+                    <select id="tipo-pedido" onchange="toggleEntrega()">
+                        <option value="retirada">Retirar no Local</option>
+                        <option value="entrega">Delivery (Taxa R$ 9,00)</option>
+                    </select>
+                </div>
                 <div class="form-group"><label for="nome-cliente">Seu Nome:</label><input type="text" id="nome-cliente" placeholder="Digite seu nome"></div>
                 <div id="dados-entrega" class="form-group"><label for="endereco-cliente">Endereço de Entrega:</label><input type="text" id="endereco-cliente" placeholder="Rua, Número, Bairro"></div>
                 <div class="form-group"><label for="forma-pagamento">Forma de Pagamento:</label><select id="forma-pagamento" onchange="toggleTroco()"><option value="Dinheiro">Dinheiro</option><option value="Cartão">Cartão</option><option value="Pix">Pix</option></select></div>
@@ -122,7 +124,6 @@
     </div>
 
     <script>
-    // --- LISTA DE ADICIONAIS REAIS ---
     const adicionaisDisponiveis = [
         { nome: 'Bacon', preco: 4.00 },
         { nome: 'Calabresa', preco: 4.00 },
@@ -136,9 +137,7 @@
         { nome: 'Nutella', preco: 4.00 },
     ];
 
-    // --- CARDÁPIO REAL DA KÁ PASTÉIS ---
     const cardapio = [
-        // SALGADOS
         { nome: "Queijo", preco: 10.00, categoria: "Salgados", ingredientes: ["Queijo"], permiteAdicionais: true },
         { nome: "Presunto e Queijo", preco: 13.00, categoria: "Salgados", ingredientes: ["Presunto", "Queijo"], permiteAdicionais: true },
         { nome: "Dois Queijos", preco: 14.00, categoria: "Salgados", ingredientes: ["Queijo", "Catupiry Scala"], permiteAdicionais: true },
@@ -154,14 +153,12 @@
         { nome: "Pastel da Ká", preco: 19.00, categoria: "Salgados", ingredientes: ["Frango", "Presunto", "Queijo", "Bacon", "Tomate", "Orégano", "Catupiry Scala"], permiteAdicionais: true },
         { nome: "Brócolis", preco: 17.00, categoria: "Salgados", ingredientes: ["Brócolis", "Queijo", "Bacon"], permiteAdicionais: true },
         
-        // DOCES
         { nome: "Banana com Canela", preco: 15.00, categoria: "Doces", ingredientes: ["Banana", "Canela"], permiteAdicionais: true },
         { nome: "Banoffe", preco: 17.00, categoria: "Doces", ingredientes: ["Banana", "Doce de Leite", "Canela"], permiteAdicionais: true },
         { nome: "Doce de Leite", preco: 15.00, categoria: "Doces", ingredientes: ["Doce de Leite"], permiteAdicionais: true },
         { nome: "Chocolate", preco: 15.00, categoria: "Doces", ingredientes: ["Chocolate"], permiteAdicionais: true },
         { nome: "Nutella", preco: 17.00, categoria: "Doces", ingredientes: ["Nutella"], permiteAdicionais: true },
 
-        // BEBIDAS
         { nome: "Coca-Cola Lata", preco: 7.00, categoria: "Bebidas", ingredientes: [], permiteAdicionais: false },
         { nome: "Coca-Cola 2 Litros", preco: 18.00, categoria: "Bebidas", ingredientes: [], permiteAdicionais: false },
         { nome: "Refrigerante Jaboti 2 Litros", preco: 10.00, categoria: "Bebidas", ingredientes: [], permiteAdicionais: false },
@@ -171,8 +168,10 @@
         { nome: "Cerveja Skol", preco: 7.00, categoria: "Bebidas", ingredientes: [], permiteAdicionais: false },
         { nome: "Cerveja Boa", preco: 7.00, categoria: "Bebidas", ingredientes: [], permiteAdicionais: false },
     ];
+
     let carrinho = [];
-    const taxaEntrega = 8.50;
+    // ATUALIZADO: Taxa de Entrega para R$ 9,00
+    const taxaEntrega = 9.00;
 
     function showPage(pageId) {
         document.getElementById('first-page').style.display = 'none';
@@ -181,28 +180,20 @@
         document.getElementById(pageId).style.display = 'block';
     }
 
-    // --- FUNÇÃO ATUALIZADA ---
     function filtrarPorCategoria(categoria) {
         let itensFiltrados = [];
         let titulo = '';
 
         if (categoria === 'Salgados') {
-            // Ao clicar em Salgados, mostra Salgados E Doces
             titulo = 'Pastéis Salgados e Doces';
             itensFiltrados = cardapio.filter(item => item.categoria === 'Salgados' || item.categoria === 'Doces');
-        
         } else if (categoria === 'Doces') {
-            // Botão Doces continua mostrando apenas Doces
             titulo = 'Cardápio de Pastéis Doces';
             itensFiltrados = cardapio.filter(item => item.categoria === categoria);
-        
         } else if (categoria === 'Bebidas') {
-            // Botão Bebidas continua mostrando apenas Bebidas
             titulo = 'Cardápio de Bebidas';
             itensFiltrados = cardapio.filter(item => item.categoria === categoria);
-        
-        } else { // 'Todos'
-            // Botão Todos mostra tudo
+        } else {
             titulo = 'Nosso Cardápio Completo';
             itensFiltrados = cardapio;
         }
@@ -240,12 +231,10 @@
         const item = cardapio.find(i => i.nome === nomeItem);
         if (!item) return;
 
-        // Se o item não permite adicionais E não tem ingredientes (ex: Bebida), adiciona direto
         if (!item.permiteAdicionais && item.ingredientes.length === 0) {
             const personalizacoes = { removidos: [], adicionados: [], obs: '' };
             adicionarItemAoCarrinho(item, personalizacoes);
             
-            // Feedback visual rápido no botão
             const btn = document.querySelector(`.btn-add[onclick="abrirModalPersonalizacao('${item.nome}')"]`);
             if(btn) {
                 btn.textContent = 'Adicionado!';
@@ -388,31 +377,27 @@
         const isEntrega = document.getElementById('tipo-pedido').value === 'entrega';
         document.getElementById('dados-entrega').style.display = isEntrega ? 'block' : 'none';
         atualizarCarrinho();
-        toggleTroco(); // Reavaliar a exibição do troco
+        toggleTroco();
     }
 
-    // --- FUNÇÃO CORRIGIDA ---
     function toggleTroco() {
         const isDinheiro = document.getElementById('forma-pagamento').value === 'Dinheiro';
-        // Mostra o campo de troco sempre que for pagamento em dinheiro
         document.getElementById('troco-group').style.display = isDinheiro ? 'block' : 'none';
     }
 
-    // --- FUNÇÃO CORRIGIDA (SEM ALERTS) ---
     function finalizarPedido() {
         const btnFinalizar = document.querySelector('.btn-finalizar');
         const originalBtnText = 'Finalizar Pedido';
         const originalBtnColor = '#d9534f';
-        const errorColor = '#dc3545'; // Cor de erro
+        const errorColor = '#dc3545';
 
-        // Função auxiliar para mostrar erros no botão
         const showError = (message) => {
             btnFinalizar.style.backgroundColor = errorColor;
             btnFinalizar.textContent = message;
             setTimeout(() => {
                 btnFinalizar.style.backgroundColor = originalBtnColor;
                 btnFinalizar.textContent = originalBtnText;
-            }, 2500); // Reverte após 2.5 segundos
+            }, 2500);
         };
 
         if (carrinho.length === 0) { 
@@ -437,15 +422,13 @@
         
         let msg = `*NOVO PEDIDO - KA PASTÉIS E CREPES*\n`;
         const separador = '--------------------------------------\n';
-
-        // Adiciona a data e a hora do pedido
         const now = new Date();
         const dataPedido = now.toLocaleDateString('pt-BR');
         const horaPedido = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        
         msg += `*Feito em:* ${dataPedido} - ${horaPedido}\n\n`;
         msg += `${separador}\n`;
 
-        // 1. Itens do Pedido
         carrinho.forEach((item, index) => {
             msg += `*${item.quantidade}x ${item.nome}* - R$ ${(item.precoFinal * item.quantidade).toFixed(2)}\n`;
             const { removidos, adicionados, obs } = item.personalizacoes;
@@ -458,10 +441,8 @@
             }
         });
         
-        // 2. Separador antes dos Totais
         msg += `\n\n${separador}\n`;
 
-        // 3. Totais e Pagamento
         const subtotalItens = carrinho.reduce((sum, item) => sum + (item.precoFinal * item.quantidade), 0);
         if (tipo === 'entrega') {
             msg += `*Subtotal dos Itens:* R$ ${subtotalItens.toFixed(2)}\n`;
@@ -475,10 +456,7 @@
             if (troco) msg += `*Troco para:* R$ ${parseFloat(troco).toFixed(2)}\n`;
         }
         
-        // 4. Separador antes dos dados do cliente
         msg += `\n${separador}\n`;
-
-        // 5. Dados do Cliente
         msg += `*Cliente:* ${nome}\n`;
         if (tipo === 'entrega') {
             msg += `*Entregar em:* ${endereco}`;
@@ -486,7 +464,7 @@
             msg += `*Pedido para Retirada*`;
         }
         
-        const numeroWhatsApp = "5516997859426"; // NÚMERO ATUALIZADO DO CARDÁPIO
+        const numeroWhatsApp = "5516997859426";
         const linkWhatsApp = `https://api.whatsapp.com/send?phone=${numeroWhatsApp}&text=${encodeURIComponent(msg)}`;
         
         window.open(linkWhatsApp, '_blank');
@@ -498,8 +476,8 @@
         document.getElementById('nome-cliente').value = '';
         document.getElementById('endereco-cliente').value = '';
         document.getElementById('tipo-pedido').value = 'retirada';
-        document.getElementById('forma-pagamento').value = 'Dinheiro'; // Reseta pagamento
-        document.getElementById('valor-troco').value = ''; // Limpa troco
+        document.getElementById('forma-pagamento').value = 'Dinheiro';
+        document.getElementById('valor-troco').value = '';
         atualizarCarrinho();
         toggleEntrega();
         showPage('first-page');
@@ -508,7 +486,7 @@
     window.onload = () => {
         showPage('first-page');
         toggleEntrega();
-        toggleTroco(); // Garante que o estado inicial do troco esteja correto
+        toggleTroco();
         atualizarCarrinho();
     };
     </script>

@@ -149,8 +149,8 @@
         { nome: "Carne e Queijo", preco: 17.00, categoria: "Salgados", ingredientes: ["Carne", "Queijo"], permiteAdicionais: true },
         { nome: "Calabresa", preco: 17.00, categoria: "Salgados", ingredientes: ["Calabresa", "Queijo", "Tomate", "Orégano"], permiteAdicionais: true },
         { nome: "Pastel Hot Dog", preco: 15.00, categoria: "Salgados", ingredientes: ["Salsicha", "Ketchup", "Mostarda", "Maionese", "Batata Palha"], permiteAdicionais: true },
-        { nome: "Bauru", preco: 17.00, categoria: "Salgados", ingredientes: ["Presunto", "Queijo", "Bacon", "Milho", "Tomate", "Catupiry Scala"], permiteAdicionais: true },
-        { nome: "Pastel da Ká", preco: 19.00, categoria: "Salgados", ingredientes: ["Frango", "Presunto", "Queijo", "Bacon", "Tomate", "Orégano", "Catupiry Scala"], permiteAdicionais: true },
+        { nome: "Bauru", preco: 18.00, categoria: "Salgados", ingredientes: ["Presunto", "Queijo", "Bacon", "Milho", "Tomate", "Catupiry Scala"], permiteAdicionais: true },
+        { nome: "Pastel da Ká", preco: 20.00, categoria: "Salgados", ingredientes: ["Frango", "Presunto", "Queijo", "Bacon", "Tomate", "Orégano", "Catupiry Scala"], permiteAdicionais: true },
         { nome: "Brócolis", preco: 17.00, categoria: "Salgados", ingredientes: ["Brócolis", "Queijo", "Bacon"], permiteAdicionais: true },
         
         { nome: "Banana com Canela", preco: 15.00, categoria: "Doces", ingredientes: ["Banana", "Canela"], permiteAdicionais: true },
@@ -170,7 +170,6 @@
     ];
 
     let carrinho = [];
-    // ATUALIZADO: Taxa de Entrega para R$ 9,00
     const taxaEntrega = 9.00;
 
     function showPage(pageId) {
@@ -185,7 +184,7 @@
         let titulo = '';
 
         if (categoria === 'Salgados') {
-            titulo = 'Pastéis Salgados e Doces';
+            titulo = 'Pastéis Salgados e Doc';
             itensFiltrados = cardapio.filter(item => item.categoria === 'Salgados' || item.categoria === 'Doces');
         } else if (categoria === 'Doces') {
             titulo = 'Cardápio de Pastéis Doces';

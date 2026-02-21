@@ -143,7 +143,7 @@
         { nome: "Dois Queijos", preco: 14.00, categoria: "Salgados", ingredientes: ["Queijo", "Catupiry Scala"], permiteAdicionais: true },
         { nome: "Pizza", preco: 14.00, categoria: "Salgados", ingredientes: ["Presunto", "Queijo", "Tomate", "Orégano"], permiteAdicionais: true },
         { nome: "Frango", preco: 14.00, categoria: "Salgados", ingredientes: ["Frango"], permiteAdicionais: true },
-        { nome: "Frango com Catupiry Scala", preco: 16.00, categoria: "Salgados", ingredientes: ["Frango", "Catupiry Scala"], permiteAdicionais: true },
+        { nome: "Frango com Catupiry Scala", preco: 17.00, categoria: "Salgados", ingredientes: ["Frango", "Catupiry Scala"], permiteAdicionais: true },
         { nome: "Palmito", preco: 15.00, categoria: "Salgados", ingredientes: ["Palmito Cremoso", "Ervilha", "Azeitona"], permiteAdicionais: true },
         { nome: "Carne", preco: 15.00, categoria: "Salgados", ingredientes: ["Carne"], permiteAdicionais: true },
         { nome: "Carne e Queijo", preco: 17.00, categoria: "Salgados", ingredientes: ["Carne", "Queijo"], permiteAdicionais: true },
@@ -184,7 +184,7 @@
         let titulo = '';
 
         if (categoria === 'Salgados') {
-            titulo = 'Pastéis Salgados e Doc';
+            titulo = 'Pastéis Salgados e Doces';
             itensFiltrados = cardapio.filter(item => item.categoria === 'Salgados' || item.categoria === 'Doces');
         } else if (categoria === 'Doces') {
             titulo = 'Cardápio de Pastéis Doces';

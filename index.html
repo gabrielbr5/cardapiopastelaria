@@ -72,10 +72,12 @@
             <button class="back-button" onclick="showPage('first-page')">⬅️ Voltar ao Início</button>
             <h2 id="menu-title">Nosso Cardápio</h2>
             <ul id="menu-items"></ul>
+            
             <div id="resumo-pedido">
                 <h2>Seu Pedido</h2>
                 <ul id="carrinho-items"></ul>
                 <div class="total-carrinho">Total: R$ <span id="total-valor">0.00</span></div>
+                
                 <div class="form-group">
                     <label for="tipo-pedido">Tipo de Pedido:</label>
                     <select id="tipo-pedido" onchange="toggleEntrega()">
@@ -137,8 +139,8 @@
         { nome: 'Nutella', preco: 6.00 },
     ];
 
+    // Cardápio atualizado: 'Queijo' e 'Chocolate' removidos; 'Nutella' ajustado para R$ 18.00
     const cardapio = [
-        { nome: "Queijo", preco: 10.00, categoria: "Salgados", ingredientes: ["Queijo"], permiteAdicionais: true },
         { nome: "Presunto e Queijo", preco: 14.00, categoria: "Salgados", ingredientes: ["Presunto", "Queijo"], permiteAdicionais: true },
         { nome: "Dois Queijos", preco: 15.00, categoria: "Salgados", ingredientes: ["Queijo", "Catupiry Scala"], permiteAdicionais: true },
         { nome: "Pizza", preco: 15.00, categoria: "Salgados", ingredientes: ["Presunto", "Queijo", "Tomate", "Orégano"], permiteAdicionais: true },
@@ -157,8 +159,7 @@
         { nome: "Banana com Canela", preco: 15.00, categoria: "Doces", ingredientes: ["Banana", "Canela"], permiteAdicionais: true },
         { nome: "Banoffe", preco: 17.00, categoria: "Doces", ingredientes: ["Banana", "Doce de Leite", "Canela"], permiteAdicionais: true },
         { nome: "Doce de Leite", preco: 15.00, categoria: "Doces", ingredientes: ["Doce de Leite"], permiteAdicionais: true },
-        { nome: "Chocolate", preco: 15.00, categoria: "Doces", ingredientes: ["Chocolate"], permiteAdicionais: true },
-        { nome: "Nutella", preco: 17.00, categoria: "Doces", ingredientes: ["Nutella"], permiteAdicionais: true },
+        { nome: "Nutella", preco: 18.00, categoria: "Doces", ingredientes: ["Nutella"], permiteAdicionais: true },
 
         { nome: "Coca-Cola Lata", preco: 7.00, categoria: "Bebidas", ingredientes: [], permiteAdicionais: false },
         { nome: "Coca-Cola 2 Litros", preco: 18.00, categoria: "Bebidas", ingredientes: [], permiteAdicionais: false },

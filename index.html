@@ -63,6 +63,7 @@
             <div class="category-buttons">
                 <button onclick="filtrarPorCategoria('Salgados')">Pastéis Salgados</button>
                 <button onclick="filtrarPorCategoria('Doces')">Pastéis Doces</button>
+                <button onclick="filtrarPorCategoria('Porções')">Porções</button>
                 <button onclick="filtrarPorCategoria('Bebidas')">Bebidas</button>
                 <button onclick="filtrarPorCategoria('Todos')">Ver Tudo</button>
             </div>
@@ -139,27 +140,25 @@
         { nome: 'Nutella', preco: 6.00 },
     ];
 
-    // Cardápio com os novos preços atualizados:
-    // - Dois Queijos: R$ 16.00
-    // - Frango com Catupiry Scala: R$ 18.00
-    // - Bauru: R$ 20.00
-    // - Pastel da Ká: R$ 22.00
     const cardapio = [
         { nome: "Presunto e Queijo", preco: 14.00, categoria: "Salgados", ingredientes: ["Presunto", "Queijo"], permiteAdicionais: true },
         { nome: "Dois Queijos", preco: 16.00, categoria: "Salgados", ingredientes: ["Queijo", "Catupiry Scala"], permiteAdicionais: true },
         { nome: "Pizza", preco: 15.00, categoria: "Salgados", ingredientes: ["Presunto", "Queijo", "Tomate", "Orégano"], permiteAdicionais: true },
-        { nome: "Frango", preco: 14.00, categoria: "Salgados", ingredientes: ["Frango"], permiteAdicionais: true },
+        { nome: "Frango", preco: 15.00, categoria: "Salgados", ingredientes: ["Frango"], permiteAdicionais: true },
         { nome: "Frango com Catupiry Scala", preco: 18.00, categoria: "Salgados", ingredientes: ["Frango", "Catupiry Scala"], permiteAdicionais: true },
         { nome: "Palmito", preco: 15.00, categoria: "Salgados", ingredientes: ["Palmito Cremoso", "Ervilha", "Azeitona"], permiteAdicionais: true },
-        { nome: "Carne", preco: 15.00, categoria: "Salgados", ingredientes: ["Carne"], permiteAdicionais: true },
-        { nome: "Carne e Queijo", preco: 18.00, categoria: "Salgados", ingredientes: ["Carne", "Queijo"], permiteAdicionais: true },
-        { nome: "Calabresa", preco: 17.00, categoria: "Salgados", ingredientes: ["Calabresa", "Queijo", "Tomate", "Orégano"], permiteAdicionais: true },
-        { nome: "Pastel Hot Dog", preco: 15.00, categoria: "Salgados", ingredientes: ["Salsicha", "Ketchup", "Mostarda", "Maionese", "Batata Palha"], permiteAdicionais: true },
+        { nome: "Carne", preco: 16.00, categoria: "Salgados", ingredientes: ["Carne"], permiteAdicionais: true },
+        { nome: "Carne e Queijo", preco: 19.00, categoria: "Salgados", ingredientes: ["Carne", "Queijo"], permiteAdicionais: true },
+        { nome: "Calabresa", preco: 18.00, categoria: "Salgados", ingredientes: ["Calabresa", "Queijo", "Tomate", "Orégano"], permiteAdicionais: true },
+        { nome: "Pastel Hot Dog", preco: 16.00, categoria: "Salgados", ingredientes: ["Salsicha", "Ketchup", "Mostarda", "Maionese", "Batata Palha"], permiteAdicionais: true },
         { nome: "Bauru", preco: 20.00, categoria: "Salgados", ingredientes: ["Presunto", "Queijo", "Bacon", "Milho", "Tomate", "Catupiry Scala"], permiteAdicionais: true },
         { nome: "Lombo", preco: 19.00, categoria: "Salgados", ingredientes: ["Lombo", "Queijo", "Catupiry Scala", "Tomate"], permiteAdicionais: true },
         { nome: "Pastel da Ká", preco: 22.00, categoria: "Salgados", ingredientes: ["Frango", "Presunto", "Queijo", "Bacon", "Tomate", "Orégano", "Catupiry Scala"], permiteAdicionais: true },
-        { nome: "Brócolis", preco: 17.00, categoria: "Salgados", ingredientes: ["Brócolis", "Queijo", "Bacon"], permiteAdicionais: true },
+        { nome: "Brócolis", preco: 18.00, categoria: "Salgados", ingredientes: ["Brócolis", "Queijo", "Bacon"], permiteAdicionais: true },
         
+        { nome: "Batata Frita Tradicional 500g", preco: 25.00, categoria: "Porções", ingredientes: ["Batata Frita 500g"], permiteAdicionais: true },
+        { nome: "Batata Frita com Cheddar e Bacon 500g", preco: 35.00, categoria: "Porções", ingredientes: ["Batata Frita 500g", "Cheddar", "Bacon"], permiteAdicionais: true },
+
         { nome: "Banana com Canela", preco: 15.00, categoria: "Doces", ingredientes: ["Banana", "Canela"], permiteAdicionais: true },
         { nome: "Banoffe", preco: 17.00, categoria: "Doces", ingredientes: ["Banana", "Doce de Leite", "Canela"], permiteAdicionais: true },
         { nome: "Doce de Leite", preco: 15.00, categoria: "Doces", ingredientes: ["Doce de Leite"], permiteAdicionais: true },
@@ -190,10 +189,13 @@
         let titulo = '';
 
         if (categoria === 'Salgados') {
-            titulo = 'Pastéis Salgados e Doces';
-            itensFiltrados = cardapio.filter(item => item.categoria === 'Salgados' || item.categoria === 'Doces');
+            titulo = 'Pastéis Salgados e Porções';
+            itensFiltrados = cardapio.filter(item => item.categoria === 'Salgados' || item.categoria === 'Porções');
         } else if (categoria === 'Doces') {
             titulo = 'Cardápio de Pastéis Doces';
+            itensFiltrados = cardapio.filter(item => item.categoria === categoria);
+        } else if (categoria === 'Porções') {
+            titulo = 'Cardápio de Porções';
             itensFiltrados = cardapio.filter(item => item.categoria === categoria);
         } else if (categoria === 'Bebidas') {
             titulo = 'Cardápio de Bebidas';
@@ -496,3 +498,4 @@
     };
     </script>
 </body>
+</html>

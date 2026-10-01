@@ -159,6 +159,11 @@
         { nome: "Batata Frita Tradicional 500g", preco: 25.00, categoria: "Porções", ingredientes: ["Batata Frita 500g"], permiteAdicionais: true },
         { nome: "Batata Frita com Cheddar e Bacon 500g", preco: 35.00, categoria: "Porções", ingredientes: ["Batata Frita 500g", "Cheddar", "Bacon"], permiteAdicionais: true },
 
+        { nome: "Suco de Polpa Morango 500ml", preco: 10.00, categoria: "Salgados", ingredientes: [], permiteAdicionais: false },
+        { nome: "Suco de Polpa Laranja 500ml", preco: 12.00, categoria: "Salgados", ingredientes: [], permiteAdicionais: false },
+        { nome: "Suco de Polpa Maracujá 500ml", preco: 12.00, categoria: "Salgados", ingredientes: [], permiteAdicionais: false },
+        { nome: "Suco de Polpa Abacaxi c/ Hortelã 500ml", preco: 10.00, categoria: "Salgados", ingredientes: [], permiteAdicionais: false },
+
         { nome: "Banana com Canela", preco: 15.00, categoria: "Doces", ingredientes: ["Banana", "Canela"], permiteAdicionais: true },
         { nome: "Banoffe", preco: 17.00, categoria: "Doces", ingredientes: ["Banana", "Doce de Leite", "Canela"], permiteAdicionais: true },
         { nome: "Doce de Leite", preco: 15.00, categoria: "Doces", ingredientes: ["Doce de Leite"], permiteAdicionais: true },
@@ -189,7 +194,7 @@
         let titulo = '';
 
         if (categoria === 'Salgados') {
-            titulo = 'Pastéis Salgados e Porções';
+            titulo = 'Pastéis Salgados, Porções e Sucos';
             itensFiltrados = cardapio.filter(item => item.categoria === 'Salgados' || item.categoria === 'Porções');
         } else if (categoria === 'Doces') {
             titulo = 'Cardápio de Pastéis Doces';
@@ -199,7 +204,7 @@
             itensFiltrados = cardapio.filter(item => item.categoria === categoria);
         } else if (categoria === 'Bebidas') {
             titulo = 'Cardápio de Bebidas';
-            itensFiltrados = cardapio.filter(item => item.categoria === categoria);
+            itensFiltrados = cardapio.filter(item => item.categoria === categoria || item.nome.startsWith('Suco'));
         } else {
             titulo = 'Nosso Cardápio Completo';
             itensFiltrados = cardapio;

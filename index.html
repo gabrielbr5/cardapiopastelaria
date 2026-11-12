@@ -111,7 +111,7 @@
             </div>
 
             <div id="modal-adicionais-container" style="display: none;">
-                <h4>Adicionar Ingredientes (R$ 6.00 cada)</h4>
+                <h4>Adicionar Ingredientes</h4>
                 <ul id="modal-adicionais-lista"></ul>
             </div>
 
@@ -133,28 +133,32 @@
         { nome: 'Carne', preco: 6.00 },
         { nome: 'Catupiry Scala', preco: 6.00 },
         { nome: 'Frango', preco: 6.00 },
-        { nome: 'Milho', preco: 6.00 },
         { nome: 'Presunto', preco: 6.00 },
         { nome: 'Queijo', preco: 6.00 },
         { nome: 'Brócolis', preco: 6.00 },
+        { nome: 'Milho', preco: 4.00 },
+        { nome: 'Azeitona', preco: 4.00 },
+        { nome: 'Tomate', preco: 4.00 },
+        { nome: 'Batata Palha', preco: 4.00 },
         { nome: 'Nutella', preco: 6.00 },
     ];
 
     const cardapio = [
+        { nome: "Queijo", preco: 10.00, categoria: "Salgados", ingredientes: ["Queijo"], permiteAdicionais: true },
         { nome: "Presunto e Queijo", preco: 14.00, categoria: "Salgados", ingredientes: ["Presunto", "Queijo"], permiteAdicionais: true },
+        { nome: "Pizza", preco: 16.00, categoria: "Salgados", ingredientes: ["Presunto", "Queijo", "Tomate", "Orégano"], permiteAdicionais: true },
         { nome: "Dois Queijos", preco: 16.00, categoria: "Salgados", ingredientes: ["Queijo", "Catupiry Scala"], permiteAdicionais: true },
-        { nome: "Pizza", preco: 15.00, categoria: "Salgados", ingredientes: ["Presunto", "Queijo", "Tomate", "Orégano"], permiteAdicionais: true },
         { nome: "Frango", preco: 15.00, categoria: "Salgados", ingredientes: ["Frango"], permiteAdicionais: true },
         { nome: "Frango com Catupiry Scala", preco: 18.00, categoria: "Salgados", ingredientes: ["Frango", "Catupiry Scala"], permiteAdicionais: true },
-        { nome: "Palmito", preco: 15.00, categoria: "Salgados", ingredientes: ["Palmito Cremoso", "Ervilha", "Azeitona"], permiteAdicionais: true },
         { nome: "Carne", preco: 16.00, categoria: "Salgados", ingredientes: ["Carne"], permiteAdicionais: true },
         { nome: "Carne e Queijo", preco: 19.00, categoria: "Salgados", ingredientes: ["Carne", "Queijo"], permiteAdicionais: true },
+        { nome: "Palmito", preco: 16.00, categoria: "Salgados", ingredientes: ["Palmito Cremoso", "Ervilha", "Azeitona"], permiteAdicionais: true },
         { nome: "Calabresa", preco: 18.00, categoria: "Salgados", ingredientes: ["Calabresa", "Queijo", "Tomate", "Orégano"], permiteAdicionais: true },
         { nome: "Pastel Hot Dog", preco: 16.00, categoria: "Salgados", ingredientes: ["Salsicha", "Ketchup", "Mostarda", "Maionese", "Batata Palha"], permiteAdicionais: true },
-        { nome: "Bauru", preco: 20.00, categoria: "Salgados", ingredientes: ["Presunto", "Queijo", "Bacon", "Milho", "Tomate", "Catupiry Scala"], permiteAdicionais: true },
-        { nome: "Lombo", preco: 19.00, categoria: "Salgados", ingredientes: ["Lombo", "Queijo", "Catupiry Scala", "Tomate"], permiteAdicionais: true },
-        { nome: "Pastel da Ká", preco: 22.00, categoria: "Salgados", ingredientes: ["Frango", "Presunto", "Queijo", "Bacon", "Tomate", "Orégano", "Catupiry Scala"], permiteAdicionais: true },
         { nome: "Brócolis", preco: 18.00, categoria: "Salgados", ingredientes: ["Brócolis", "Queijo", "Bacon"], permiteAdicionais: true },
+        { nome: "Bauru", preco: 21.00, categoria: "Salgados", ingredientes: ["Presunto", "Queijo", "Bacon", "Milho", "Tomate", "Catupiry Scala"], permiteAdicionais: true },
+        { nome: "Pastel da Ká", preco: 23.00, categoria: "Salgados", ingredientes: ["Frango", "Presunto", "Queijo", "Bacon", "Tomate", "Orégano", "Catupiry Scala"], permiteAdicionais: true },
+        { nome: "Lombo Canadense", preco: 19.00, categoria: "Salgados", ingredientes: ["Lombo", "Queijo", "Catupiry Scala", "Tomate"], permiteAdicionais: true },
         
         { nome: "Batata Frita Tradicional 500g", preco: 25.00, categoria: "Porções", ingredientes: ["Batata Frita 500g"], permiteAdicionais: true },
         { nome: "Batata Frita com Cheddar e Bacon 500g", preco: 35.00, categoria: "Porções", ingredientes: ["Batata Frita 500g", "Cheddar", "Bacon"], permiteAdicionais: true },
